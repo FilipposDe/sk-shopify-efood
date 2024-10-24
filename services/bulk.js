@@ -233,5 +233,6 @@ export async function bulkQuery(query, client) {
 	const text = await mutationResult.text()
 
 	// 7. Save contents
-	fs.writeFileSync('temp/bulk-q-result.jsonl', text)
+	return text
+	// fs.writeFileSync('temp/bulk-q-result.jsonl', text)
 }

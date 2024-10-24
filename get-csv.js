@@ -9,8 +9,8 @@ import { htmlToText } from 'html-to-text'
 dotenv.config()
 
 export default async function getFinalCSV() {
-	await storeJsonl()
-	const csvStr = generateCSV()
+	const jsonlText = await storeJsonl()
+	const csvStr = generateCSV(jsonlText)
 	return csvStr
 }
 
@@ -74,14 +74,11 @@ async function storeJsonl() {
 	const session = shopify.session.customAppSession(process.env.SHOP)
 	const client = new shopify.clients.Graphql({ session })
 
-	await bulkQuery(queryStr.replace(/"/g, '\\"'), client)
+	const text = await bulkQuery(queryStr.replace(/"/g, '\\"'), client)
+	return text
 }
 
-function generateCSV() {
-	const productsStr = fs
-		.readFileSync('temp/bulk-q-result.jsonl', 'utf8')
-		.toString()
-
+function generateCSV(productsStr) {
 	const products = {}
 	const optionNames = new Set()
 
