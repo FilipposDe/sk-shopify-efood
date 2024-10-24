@@ -1,0 +1,28 @@
+{
+    "name": "sk-shopify-efood",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "start": "node server.js",
+        "graphql-codegen": "graphql-codegen"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@shopify/admin-api-client": "^1.0.3",
+        "@shopify/shopify-api": "^11.5.0",
+        "basic-auth": "^2.0.1",
+        "csv": "^6.3.8",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.1",
+        "form-data": "^4.0.0",
+        "helmet": "^8.0.0",
+        "html-to-text": "^9.0.5",
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "@shopify/api-codegen-preset": "^1.1.1"
+    }
+}
