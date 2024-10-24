@@ -47,6 +47,7 @@ app.post('/initial-catalog', auth, async (req, res) => {
 			'attachment; filename="output.csv"'
 		)
 		res.setHeader('Content-Type', 'text/csv')
+		console.log('Created initial catalog')
 		res.send(str)
 	} catch (error) {
 		console.error(error)
