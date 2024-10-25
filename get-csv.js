@@ -40,9 +40,28 @@ async function storeJsonl() {
 						inMeatProducts: inCollection(
 							id: "gid://shopify/Collection/604542337361"
 						)
+						cuttingMethods: metafield(
+							key: "cutting_methods"
+							namespace: "custom"
+						) {
+							value
+							references {
+								edges {
+									node {
+										... on Metaobject {
+											id
+											title: field(key: "title") {
+												value
+											}
+										}
+									}
+								}
+							}
+						}
 						variants {
 							edges {
 								node {
+									id
 									sku
 									price
 									selectedOptions {
@@ -75,6 +94,9 @@ async function storeJsonl() {
 	const client = new shopify.clients.Graphql({ session })
 
 	const text = await bulkQuery(queryStr.replace(/"/g, '\\"'), client)
+
+	fs.writeFileSync('temp/initial.jsonl', text)
+
 	return text
 }
 
@@ -88,21 +110,29 @@ function generateCSV(productsStr) {
 		}
 		const v = JSON.parse(line)
 
-		if (v.id) {
+		// {"id":"gid:\/\/shopify\/Metaobject\/114721325393","title":{"value":"Ολόκληρο"},"__parentId":"gid:\/\/shopify\/Product\/8683047289169"}
+
+		if (v.id.includes('/Product/')) {
 			if (products[v.id]) {
 				products[v.id] = { ...products[v.id], ...v }
 			} else {
-				products[v.id] = { ...v, ProductVariants: [] }
+				products[v.id] = { ...v, ProductVariants: [], Metaobjects: [] }
 			}
 			for (const o of v.options) {
 				optionNames.add(o.name)
 			}
-		} else {
+		} else if (v.id.includes('/ProductVariant/')) {
 			const pId = v.__parentId
 			if (!products[pId]) {
-				products[pId] = { ProductVariants: [] }
+				products[pId] = { ProductVariants: [], Metaobjects: [] }
 			}
 			products[pId].ProductVariants.push(v)
+		} else if (v.id.includes('/Metaobject/')) {
+			const pId = v.__parentId
+			if (!products[pId]) {
+				products[pId] = { ProductVariants: [], Metaobjects: [] }
+			}
+			products[pId].Metaobjects.push(v)
 		}
 	}
 
@@ -115,6 +145,10 @@ function generateCSV(productsStr) {
 	const items = []
 
 	for (const v of Object.values(products)) {
+		const cuttingMethods = (v.Metaobjects || [])
+			.map((m) => m?.title?.value || '')
+			.join(', ')
+
 		if (v.options[0].name === 'Title') {
 			items.push({
 				SKU: v.ProductVariants[0].sku.replace(/\s/g, '_'),
@@ -126,6 +160,7 @@ function generateCSV(productsStr) {
 				'weightable_attributes::minimum_starting_weight::unit': '',
 				Price: v.ProductVariants[0].price,
 				Comments: 'Τεμαχιακό προιόν / τιμή τεμαχίου',
+				Τρόποι_κοπής: cuttingMethods || '',
 			})
 		} else if (v.options.some((o) => o.name === 'Βάρος')) {
 			const variantsByWeight = v.ProductVariants.sort((a, b) => {
@@ -163,6 +198,7 @@ function generateCSV(productsStr) {
 				Comments: `Ζυγιζόμενο προιόν με βήμα/ τιμή κιλού. ${
 					hasCutMethod ? 'Προσθέστε στα σχόλια τρόπο κοπής.' : ''
 				}`,
+				Τρόποι_κοπής: cuttingMethods || '',
 			})
 		}
 	}
