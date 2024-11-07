@@ -5,6 +5,7 @@ import '@shopify/shopify-api/adapters/node'
 import { shopifyApi, ApiVersion } from '@shopify/shopify-api'
 import { bulkQuery } from './services/bulk.js'
 import { htmlToText } from 'html-to-text'
+import { createCSV } from './helpers/index.js'
 
 dotenv.config()
 
@@ -95,7 +96,7 @@ async function storeJsonl() {
 
 	const text = await bulkQuery(queryStr.replace(/"/g, '\\"'), client)
 
-	fs.writeFileSync('temp/initial.jsonl', text)
+	// fs.writeFileSync('temp/initial.jsonl', text)
 
 	return text
 }
@@ -109,8 +110,6 @@ function generateCSV(productsStr) {
 			continue
 		}
 		const v = JSON.parse(line)
-
-		// {"id":"gid:\/\/shopify\/Metaobject\/114721325393","title":{"value":"Ολόκληρο"},"__parentId":"gid:\/\/shopify\/Product\/8683047289169"}
 
 		if (v.id.includes('/Product/')) {
 			if (products[v.id]) {
@@ -206,18 +205,6 @@ function generateCSV(productsStr) {
 	const csvStr = createCSV(items)
 
 	return csvStr
-}
-
-// fs.writeFileSync('temp/initial.csv', csvStr)
-
-function createCSV(data) {
-	const header = Object.keys(data[0]).join(',')
-	const rows = data.map((row) =>
-		Object.values(row)
-			.map((v) => `"${String(v).replace(/"/g, '""')}"`)
-			.join(',')
-	)
-	return header + '\n' + rows.join('\n')
 }
 
 function processDescription(html) {
