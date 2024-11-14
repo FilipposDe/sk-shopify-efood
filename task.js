@@ -2,6 +2,8 @@ import SftpClient from 'ssh2-sftp-client'
 import dotenv from 'dotenv'
 import getFTPCSV from './get-ftp-csv.js'
 
+// flyctl machine run . --config fly-task.toml --schedule=daily
+
 dotenv.config()
 
 const csvStr = await getFTPCSV()
@@ -15,9 +17,20 @@ try {
 		password: process.env.FTP_PASSWORD,
 	})
 
-	await client.put(csvStr, 'catalog/siakos_7531684.csv')
+	// const files = await client.list('.')
+	// const csvStr = '1'
+	const buffer = Buffer.from(csvStr)
+
+	// List filesfirst
+	console.log(await client.list('./catalog'))
+
+	await client.put(buffer, './catalog/siakos_7531684.csv')
+
+	console.log('File transferred successfully')
 } catch (error) {
 	console.error('SFTP connection error:', error)
 } finally {
 	client.end()
 }
+
+process.exit(0)

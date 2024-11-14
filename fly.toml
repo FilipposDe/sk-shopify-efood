@@ -1,0 +1,24 @@
+# fly.toml app configuration file generated for sk-shopify-efood on 2024-11-14T18:45:58+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'sk-shopify-efood'
+primary_region = 'otp'
+
+[build]
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  max_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
+
+[env]
+    SHOP = "d4f899.myshopify.com"

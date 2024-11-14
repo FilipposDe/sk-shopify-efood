@@ -21,12 +21,14 @@
         "dotenv": "^16.4.5",
         "express": "^4.21.1",
         "form-data": "^4.0.0",
+        "graphql-tag": "^2.12.6",
         "helmet": "^8.0.0",
         "html-to-text": "^9.0.5",
         "node-fetch": "^3.3.2",
         "ssh2-sftp-client": "^11.0.0"
     },
     "devDependencies": {
+        "@flydotio/dockerfile": "^0.5.9",
         "@shopify/api-codegen-preset": "^1.1.1",
         "eslint": "^9.14.0",
         "globals": "^15.12.0"

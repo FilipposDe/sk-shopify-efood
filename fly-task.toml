@@ -1,0 +1,24 @@
+# fly.toml app configuration file generated for sk-shopify-efood-task on 2024-11-14T19:00:12+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'sk-shopify-efood-task'
+primary_region = 'otp'
+
+[build]
+  dockerfile = "Dockerfile.task"
+
+[processes]
+  task = 'npm run sync'
+
+[deploy]
+  command = "npm run sync"
+  release_command = "npm run sync"
+
+[[vm]]
+  size = 'shared-cpu-1x'
+
+[env]
+  FTP_HOST = 'vendor-automation-sftp-live-eu.prod.aws.qcommerce.live'
+  SHOP = 'd4f899.myshopify.com'
