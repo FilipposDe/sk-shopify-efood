@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "node server.js",
+        "sync": "node task.js",
         "dev": "node --watch server.js",
         "lint": "eslint",
         "graphql-codegen": "graphql-codegen"
@@ -22,7 +23,8 @@
         "form-data": "^4.0.0",
         "helmet": "^8.0.0",
         "html-to-text": "^9.0.5",
-        "node-fetch": "^3.3.2"
+        "node-fetch": "^3.3.2",
+        "ssh2-sftp-client": "^11.0.0"
     },
     "devDependencies": {
         "@shopify/api-codegen-preset": "^1.1.1",
