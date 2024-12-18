@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import fs from 'fs'
+// import fs from 'fs'
 import dotenv from 'dotenv'
 import '@shopify/shopify-api/adapters/node'
 import { shopifyApi, ApiVersion } from '@shopify/shopify-api'
@@ -142,13 +142,18 @@ function generateCSV(productsStr) {
 				sku: lightestVariant.sku.replace(/\s/g, '_'),
 				price: lightestVariant.price,
 			})
+		} else if (
+			v.options.length === 1 &&
+			v.options[0].name.includes('Τρόπος κοπής')
+		) {
+			items.push({
+				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+				price: v.ProductVariants[0].price,
+			})
 		}
 	}
 
 	const csvStr = createCSV(items)
-
-	// Write CSV to file
-	// fs.writeFileSync('temp/price.csv', csvStr)
 
 	return csvStr
 }

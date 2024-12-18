@@ -17,8 +17,6 @@ try {
 		password: process.env.FTP_PASSWORD,
 	})
 
-	// const files = await client.list('.')
-	// const csvStr = '1'
 	const buffer = Buffer.from(csvStr)
 
 	// List filesfirst
