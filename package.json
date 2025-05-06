@@ -7,6 +7,7 @@
         "start": "node server.js",
         "sync": "node task.js",
         "dev": "node --watch server.js",
+        "dev:task": "node manual.js",
         "lint": "eslint",
         "graphql-codegen": "graphql-codegen"
     },

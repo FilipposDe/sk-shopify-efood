@@ -8,6 +8,12 @@ import { createCSV } from './helpers/index.js'
 
 dotenv.config()
 
+const PRICE_INCREASE = 0.05
+
+function preciseMultiply(a, b) {
+	return Math.round(a * b * 100) / 100
+}
+
 export default async function getFTPCSV() {
 	const jsonlText = await storeJsonl()
 	const csvStr = generateCSV(jsonlText)
@@ -43,6 +49,10 @@ async function storeJsonl() {
 									id
 									sku
 									price
+									inventoryQuantity
+									inventoryItem {
+										tracked
+									}
 									selectedOptions {
 										name
 										value
@@ -119,10 +129,19 @@ function generateCSV(productsStr) {
 	const items = []
 
 	for (const v of Object.values(products)) {
+		// if (
+		// 	v.ProductVariants?.[0].inventoryItem?.tracked &&
+		// 	v.ProductVariants?.[0].inventoryQuantity <= 0
+		// ) {
+		// 	continue
+		// }
+
 		if (v.options[0].name === 'Title') {
 			items.push({
 				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
-				price: v.ProductVariants[0].price,
+				price: preciseMultiply(
+					v.ProductVariants[0].price * PRICE_INCREASE
+				),
 			})
 		} else if (v.options.some((o) => o.name === 'Βάρος')) {
 			const variantsByWeight = v.ProductVariants.sort((a, b) => {
@@ -140,7 +159,7 @@ function generateCSV(productsStr) {
 
 			items.push({
 				sku: lightestVariant.sku.replace(/\s/g, '_'),
-				price: lightestVariant.price,
+				price: preciseMultiply(lightestVariant.price, PRICE_INCREASE),
 			})
 		} else if (
 			v.options.length === 1 &&
@@ -148,7 +167,10 @@ function generateCSV(productsStr) {
 		) {
 			items.push({
 				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
-				price: v.ProductVariants[0].price,
+				price: preciseMultiply(
+					v.ProductVariants[0].price,
+					PRICE_INCREASE
+				),
 			})
 		}
 	}
