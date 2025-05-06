@@ -1,12 +1,12 @@
 import SftpClient from 'ssh2-sftp-client'
 import dotenv from 'dotenv'
-import getFTPCSV from './get-ftp-csv.js'
+import getFTPCSVs from './get-ftp-csvs.js'
 
 // flyctl machine run . --config fly-task.toml --schedule=daily
 
 dotenv.config()
 
-const csvStr = await getFTPCSV()
+const [csvStr, discountCsvStr] = await getFTPCSVs()
 
 const client = new SftpClient()
 try {
@@ -18,11 +18,13 @@ try {
 	})
 
 	const buffer = Buffer.from(csvStr)
+	const discountBuffer = Buffer.from(discountCsvStr)
 
-	// List filesfirst
-	console.log(await client.list('./catalog'))
+	// List files first
+	// console.log(await client.list('./catalog'))
 
 	await client.put(buffer, './catalog/siakos_7531684.csv')
+	await client.put(discountBuffer, './promotions/siakos_7531684.csv')
 
 	console.log('File transferred successfully')
 } catch (error) {

@@ -1,5 +1,6 @@
 import fs from 'fs'
-import getFTPCSV from './get-ftp-csv.js'
+import getFTPCSVs from './get-ftp-csvs.js'
 
-const csvStr = await getFTPCSV()
+const [csvStr, discountCsvStr] = await getFTPCSVs()
 fs.writeFileSync('temp/manual-ftp.csv', csvStr, 'utf8')
+fs.writeFileSync('temp/manual-ftp-discount.csv', discountCsvStr, 'utf8')

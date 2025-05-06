@@ -8,16 +8,16 @@ import { createCSV } from './helpers/index.js'
 
 dotenv.config()
 
-const PRICE_INCREASE = 0.05
+const PRICE_ADJUST = 1.05
 
 function preciseMultiply(a, b) {
-	return Math.round(a * b * 100) / 100
+	return Math.round(Number(a) * Number(b) * 100) / 100
 }
 
-export default async function getFTPCSV() {
+export default async function getFTPCSVs() {
 	const jsonlText = await storeJsonl()
-	const csvStr = generateCSV(jsonlText)
-	return csvStr
+	const csvStrs = generateCSVs(jsonlText)
+	return csvStrs
 }
 
 async function storeJsonl() {
@@ -49,6 +49,7 @@ async function storeJsonl() {
 									id
 									sku
 									price
+									compareAtPrice
 									inventoryQuantity
 									inventoryItem {
 										tracked
@@ -84,14 +85,25 @@ async function storeJsonl() {
 
 	const text = await bulkQuery(queryStr.replace(/"/g, '\\"'), client)
 
-	// fs.writeFileSync('temp/initial.jsonl', text)
-
 	return text
 }
 
-function generateCSV(productsStr) {
+function generateCSVs(productsStr) {
 	const products = {}
 	const optionNames = new Set()
+
+	const now = new Date()
+	const tomorrow = new Date()
+	tomorrow.setDate(now.getDate() + 1)
+	const dateStr = tomorrow.toISOString().split('T')[0]
+	const startDateStr = `${dateStr} 00:00:00`
+	const endDateStr = `${dateStr} 23:59:59`
+
+	const discountFields = {
+		campaign_status: 1,
+		start_date: startDateStr,
+		end_date: endDateStr,
+	}
 
 	for (const line of productsStr.split('\n')) {
 		if (!line) {
@@ -127,6 +139,7 @@ function generateCSV(productsStr) {
 	}
 
 	const items = []
+	const discountItems = []
 
 	for (const v of Object.values(products)) {
 		// if (
@@ -140,9 +153,21 @@ function generateCSV(productsStr) {
 			items.push({
 				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
 				price: preciseMultiply(
-					v.ProductVariants[0].price * PRICE_INCREASE
+					v.ProductVariants[0].compareAtPrice ||
+						v.ProductVariants[0].price,
+					PRICE_ADJUST
 				),
 			})
+			if (v.ProductVariants[0].compareAtPrice) {
+				discountItems.push({
+					sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+					discounted_price: preciseMultiply(
+						v.ProductVariants[0].price,
+						PRICE_ADJUST
+					),
+					...discountFields,
+				})
+			}
 		} else if (v.options.some((o) => o.name === 'Βάρος')) {
 			const variantsByWeight = v.ProductVariants.sort((a, b) => {
 				return (
@@ -159,8 +184,21 @@ function generateCSV(productsStr) {
 
 			items.push({
 				sku: lightestVariant.sku.replace(/\s/g, '_'),
-				price: preciseMultiply(lightestVariant.price, PRICE_INCREASE),
+				price: preciseMultiply(
+					lightestVariant.compareAtPrice || lightestVariant.price,
+					PRICE_ADJUST
+				),
 			})
+			if (lightestVariant.compareAtPrice) {
+				discountItems.push({
+					sku: lightestVariant.sku.replace(/\s/g, '_'),
+					discounted_price: preciseMultiply(
+						lightestVariant.price,
+						PRICE_ADJUST
+					),
+					...discountFields,
+				})
+			}
 		} else if (
 			v.options.length === 1 &&
 			v.options[0].name.includes('Τρόπος κοπής')
@@ -168,14 +206,26 @@ function generateCSV(productsStr) {
 			items.push({
 				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
 				price: preciseMultiply(
-					v.ProductVariants[0].price,
-					PRICE_INCREASE
+					v.ProductVariants[0].compareAtPrice ||
+						v.ProductVariants[0].price,
+					PRICE_ADJUST
 				),
 			})
+			if (v.ProductVariants[0].compareAtPrice) {
+				discountItems.push({
+					sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+					discounted_price: preciseMultiply(
+						v.ProductVariants[0].price,
+						PRICE_ADJUST
+					),
+					...discountFields,
+				})
+			}
 		}
 	}
 
 	const csvStr = createCSV(items)
+	const discountCsvStr = createCSV(discountItems)
 
-	return csvStr
+	return [csvStr, discountCsvStr]
 }
