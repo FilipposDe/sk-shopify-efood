@@ -1,5 +1,6 @@
-import SftpClient from 'ssh2-sftp-client'
+import fs from 'fs'
 import dotenv from 'dotenv'
+import SftpClient from 'ssh2-sftp-client'
 import getFTPCSVs from './get-ftp-csvs.js'
 
 // flyctl machine run . --config fly-task.toml --schedule=daily
@@ -22,6 +23,10 @@ try {
 
 	// List files first
 	// console.log(await client.list('./catalog'))
+
+	// Write those two files locally with fs
+	// fs.writeFileSync('./dev-out/catalog/siakos_7531684.csv', buffer)
+	// fs.writeFileSync('./dev-out/promotions/siakos_7531684.csv', discountBuffer)
 
 	await client.put(buffer, './catalog/siakos_7531684.csv')
 	await client.put(discountBuffer, './promotions/siakos_7531684.csv')
