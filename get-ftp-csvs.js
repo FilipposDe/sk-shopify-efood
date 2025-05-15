@@ -150,17 +150,24 @@ function generateCSVs(productsStr) {
 		// }
 
 		if (v.options[0].name === 'Title') {
+			const sku = v.ProductVariants[0].sku.replace(/\s/g, '_')
+			if (!sku) continue
 			items.push({
-				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+				sku,
 				price: preciseMultiply(
-					v.ProductVariants[0].compareAtPrice ||
-						v.ProductVariants[0].price,
+					Number(v.ProductVariants[0].compareAtPrice) >
+						Number(v.ProductVariants[0].price)
+						? v.ProductVariants[0].compareAtPrice
+						: v.ProductVariants[0].price,
 					PRICE_ADJUST
 				),
 			})
-			if (v.ProductVariants[0].compareAtPrice) {
+			if (
+				Number(v.ProductVariants[0].compareAtPrice) >
+				Number(v.ProductVariants[0].price)
+			) {
 				discountItems.push({
-					sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+					sku,
 					discounted_price: preciseMultiply(
 						v.ProductVariants[0].price,
 						PRICE_ADJUST
@@ -182,16 +189,25 @@ function generateCSVs(productsStr) {
 
 			const lightestVariant = variantsByWeight[0]
 
+			const sku = lightestVariant.sku.replace(/\s/g, '_')
+			if (!sku) continue
+
 			items.push({
-				sku: lightestVariant.sku.replace(/\s/g, '_'),
+				sku,
 				price: preciseMultiply(
-					lightestVariant.compareAtPrice || lightestVariant.price,
+					Number(lightestVariant.compareAtPrice) >
+						Number(lightestVariant.price)
+						? lightestVariant.compareAtPrice
+						: lightestVariant.price,
 					PRICE_ADJUST
 				),
 			})
-			if (lightestVariant.compareAtPrice) {
+			if (
+				Number(lightestVariant.compareAtPrice) >
+				Number(lightestVariant.price)
+			) {
 				discountItems.push({
-					sku: lightestVariant.sku.replace(/\s/g, '_'),
+					sku,
 					discounted_price: preciseMultiply(
 						lightestVariant.price,
 						PRICE_ADJUST
@@ -203,17 +219,24 @@ function generateCSVs(productsStr) {
 			v.options.length === 1 &&
 			v.options[0].name.includes('Τρόπος κοπής')
 		) {
+			const sku = v.ProductVariants[0].sku.replace(/\s/g, '_')
+			if (!sku) continue
 			items.push({
-				sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+				sku,
 				price: preciseMultiply(
-					v.ProductVariants[0].compareAtPrice ||
-						v.ProductVariants[0].price,
+					Number(v.ProductVariants[0].compareAtPrice) >
+						Number(v.ProductVariants[0].price)
+						? v.ProductVariants[0].compareAtPrice
+						: v.ProductVariants[0].price,
 					PRICE_ADJUST
 				),
 			})
-			if (v.ProductVariants[0].compareAtPrice) {
+			if (
+				Number(v.ProductVariants[0].compareAtPrice) >
+				Number(v.ProductVariants[0].price)
+			) {
 				discountItems.push({
-					sku: v.ProductVariants[0].sku.replace(/\s/g, '_'),
+					sku,
 					discounted_price: preciseMultiply(
 						v.ProductVariants[0].price,
 						PRICE_ADJUST
