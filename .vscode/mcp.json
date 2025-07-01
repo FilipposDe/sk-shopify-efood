@@ -1,0 +1,9 @@
+{
+    "servers": {
+        "shopify-docs": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@shopify/dev-mcp@latest"]
+        }
+    }
+}
