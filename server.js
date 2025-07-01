@@ -3,6 +3,7 @@ import express from 'express'
 import helmet from 'helmet'
 import basicAuth from 'basic-auth'
 import getFinalCSV from './get-csv.js'
+import { generateAndPrintOrder } from './services/print.js'
 
 dotenv.config()
 
@@ -53,6 +54,11 @@ app.post('/initial-catalog', auth, async (req, res) => {
 		console.error(error)
 		res.sendStatus(500)
 	}
+})
+
+app.post('/webhooks/order-created', async (req, res) => {
+	generateAndPrintOrder(req.body)
+	res.sendStatus(200)
 })
 
 const PORT = process.env.PORT || 3000
