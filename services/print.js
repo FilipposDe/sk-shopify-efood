@@ -160,7 +160,6 @@ export async function generateAndPrintOrder(restOrder) {
 		})
 	}
 	await renderPage(doc, barcodeInstructions)
-	doc.addPage()
 
 	// Line item pages (centered vertically)
 	const lineNodes = order.lineItems.edges
