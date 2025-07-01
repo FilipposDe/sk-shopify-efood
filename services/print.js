@@ -246,47 +246,48 @@ export async function generateAndPrintOrder(restOrder) {
 }
 
 async function getOrderNode(id) {
+	console.log(id)
 	const queryStr = gql`
-		{
-			order(id: "${id}") {
+		query getOrder($id: ID!) {
+			order(id: $id) {
 				name
-                shippingAddress {
-                    name
-                    company
-                    address1
-                    address2
-                    city
-                    province
-                    zip
-                    phone
-                }
-                fulfillments {
-                    trackingInfo {
-                        number
-                    }
-                }
-                lineItems(first: 250) {
-                    edges {
-                        node {
-                            title
-                            originalTotalSet {
-                                presentmentMoney {
-                                    amount
-                                }
-                            }
-                            variant {
-                                selectedOptions {
-                                    name
-                                    value
-                                }
-                            }
-                        }
-                    }
-                }
-                # shop {
-                #     name
-                #     phone
-                # }
+				shippingAddress {
+					name
+					company
+					address1
+					address2
+					city
+					province
+					zip
+					phone
+				}
+				fulfillments {
+					trackingInfo {
+						number
+					}
+				}
+				lineItems(first: 250) {
+					edges {
+						node {
+							title
+							originalTotalSet {
+								presentmentMoney {
+									amount
+								}
+							}
+							variant {
+								selectedOptions {
+									name
+									value
+								}
+							}
+						}
+					}
+				}
+				# shop {
+				#     name
+				#     phone
+				# }
 			}
 		}
 	`.loc.source.body
@@ -307,7 +308,10 @@ async function getOrderNode(id) {
 	const session = shopify.session.customAppSession(process.env.SHOP)
 	const client = new shopify.clients.Graphql({ session })
 
-	const res = await client.request(queryStr)
+	const res = await client.request(queryStr, {
+		variables: { id },
+	})
+	console.log(res.data)
 	return res.data.order
 }
 
