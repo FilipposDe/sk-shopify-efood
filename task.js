@@ -1,9 +1,8 @@
-import fs from 'fs'
 import dotenv from 'dotenv'
 import SftpClient from 'ssh2-sftp-client'
 import getFTPCSVs from './get-ftp-csvs.js'
 
-// flyctl machine run . --config fly-task.toml --schedule=daily
+// flyctl machine run . --config fly-task.toml --schedule=daily --name=task
 
 dotenv.config()
 

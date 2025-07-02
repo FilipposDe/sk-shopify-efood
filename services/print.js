@@ -218,30 +218,35 @@ export async function generateAndPrintOrder(restOrder) {
 	// Log the buffer size
 	console.log(`Generated PDF size: ${buffer.length} bytes`)
 
-	// // Send to PrintNode
-	// const res = await fetch('https://api.printnode.com/printjobs', {
-	// 	method: 'POST',
-	// 	headers: {
-	// 		Authorization:
-	// 			'Basic ' +
-	// 			Buffer.from(`${printNodeApiKey}:`).toString('base64'),
-	// 		'Content-Type': 'application/json',
-	// 	},
-	// 	body: JSON.stringify({
-	// 		printerId,
-	// 		title: `Order ${order.name}`,
-	// 		contentType: 'pdf_base64',
-	// 		content: buffer.toString('base64'),
-	// 		source: 'Shopify Auto Print',
-	// 	}),
-	// })
+	// Send to PrintNode
+	const res = await fetch('https://api.printnode.com/printjobs', {
+		method: 'POST',
+		headers: {
+			Authorization:
+				'Basic ' +
+				Buffer.from(`${process.env.PRINT_NODE_KEY}:`).toString(
+					'base64'
+				),
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			printerId: process.env.PRINT_NODE_PRINTER_ID,
+			title: `Siakos.gr order ${order.name}`,
+			contentType: 'pdf_base64',
+			content: buffer.toString('base64'),
+			options: {
+				paper: process.env.PRINT_NODE_PAPER,
+				fit_to_page: true,
+			},
+		}),
+	})
 
-	// if (!res.ok) {
-	// 	const text = await res.text()
-	// 	throw new Error(`PrintNode error: ${res.status} ${text}`)
-	// }
+	if (!res.ok) {
+		const text = await res.text()
+		throw new Error(`PrintNode error: ${res.status} ${text}`)
+	}
 
-	// return await res.json()
+	return await res.json()
 }
 
 async function getOrderNode(id) {
