@@ -139,7 +139,10 @@ export async function generateAndPrintOrder(restOrder) {
 	const barcodeInstructions = []
 	barcodeInstructions.push({ type: 'text', text: order.name || '' })
 	if (shipping.name)
-		barcodeInstructions.push({ type: 'text', text: shipping.name })
+		barcodeInstructions.push({
+			type: 'text',
+			text: shipping.name,
+		})
 	if (shipping.address1)
 		barcodeInstructions.push({ type: 'text', text: shipping.address1 })
 	if (shipping.address2)
@@ -155,8 +158,8 @@ export async function generateAndPrintOrder(restOrder) {
 			url: `https://barcodeapi.org/api/128/${encodeURIComponent(
 				trackingNumber
 			)}`,
-			fitWidth: 120 * 0.5,
-			fitHeight: 50 * 0.5,
+			fitWidth: 120 * 0.75,
+			fitHeight: 50 * 0.75,
 		})
 	}
 	await renderPage(doc, barcodeInstructions)
@@ -213,9 +216,7 @@ export async function generateAndPrintOrder(restOrder) {
 	await new Promise((resolve) => stream.on('finish', resolve))
 	const buffer = Buffer.concat(bufferChunks)
 	// fs.writeFileSync('order.pdf', buffer)
-	// return buffer
 
-	// Log the buffer size
 	console.log(`Generated PDF size: ${buffer.length} bytes`)
 
 	// Send to PrintNode
@@ -315,7 +316,6 @@ async function getOrderNode(id) {
 	const res = await client.request(queryStr, {
 		variables: { id },
 	})
-	console.log(res.data)
 	return res.data.order
 }
 
@@ -351,92 +351,6 @@ async function getShop() {
 	return res.data.shop
 }
 
-// // Sample Shopify GraphQL order node data
-// const sampleOrder = {
-// 	name: '#80597',
-// 	shippingAddress: {
-// 		name: 'Παναγιώτα Καρμή',
-// 		company: null,
-// 		address1: '25ης Μαρτίου 70',
-// 		address2: '2ος',
-// 		city: 'Πειραιάς',
-// 		province: null,
-// 		zip: '185 42',
-// 		phone: '+306946466778',
-// 	},
-// 	fulfillments: [
-// 		{
-// 			trackingInfo: [{ number: '17970222' }],
-// 		},
-// 	],
-// 	lineItems: {
-// 		edges: [
-// 			{
-// 				node: {
-// 					title: 'Φιλέτο Κοτόπουλο βιολογικό πίνδος - Ολόκληρο / 1',
-// 					originalTotalSet: { presentmentMoney: { amount: '23.90' } },
-// 					variant: {
-// 						selectedOptions: [
-// 							{ name: 'Βάρος', value: '1' },
-// 							{ name: 'Τύπος', value: 'Ολόκληρο' },
-// 						],
-// 					},
-//
-// 				},
-// 			},
-// 			{
-// 				node: {
-// 					title: 'Νουά Από Βιολογική Μοσχίδα Ελλάδος - Ολόκληρο / 0.5',
-// 					originalTotalSet: { presentmentMoney: { amount: '11.50' } },
-// 					variant: {
-// 						selectedOptions: [
-// 							{ name: 'Βάρος', value: '0.5' },
-// 							{ name: 'Τύπος', value: 'Ολόκληρο' },
-// 						],
-// 					},
-//
-// 				},
-// 			},
-// 			{
-// 				node: {
-// 					title: 'Κιμάς Άπαχος Από Βιολογική Μοσχίδα Ελλάδος - 0.5',
-// 					originalTotalSet: { presentmentMoney: { amount: '10.50' } },
-// 					variant: {
-// 						selectedOptions: [{ name: 'Βάρος', value: '0.5' }],
-// 					},
-// 					product: {
-// 						options: ['Βάρος'],
-// 					},
-// 				},
-// 			},
-// 			{
-// 				node: {
-// 					title: 'Another product',
-// 					originalTotalSet: { presentmentMoney: { amount: '5.00' } },
-// 					variant: {
-// 						selectedOptions: [],
-// 					},
-//
-// 				},
-// 			},
-// 			{
-// 				node: {
-// 					title: 'Tip',
-// 					originalTotalSet: { presentmentMoney: { amount: '2.00' } },
-// 					variant: {
-// 						selectedOptions: [],
-// 					},
-//
-// 				},
-// 			},
-// 		],
-// 	},
-// 	shop: {
-// 		name: 'siakos.gr',
-// 		phone: '+302104123456',
-// 	},
-// }
-
-// generateAndPrintOrder(sampleOrder).then((buffer) =>
-// 	fs.writeFileSync('order.pdf', buffer)
-// )
+// generateAndPrintOrder({
+// 	admin_graphql_api_id: 'gid://shopify/Order/6736241230161',
+// }).then((buffer) => fs.writeFileSync('order.pdf', buffer))
