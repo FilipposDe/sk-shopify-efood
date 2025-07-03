@@ -59,6 +59,10 @@ app.post('/initial-catalog', auth, async (req, res) => {
 })
 
 app.post('/webhooks/order-created', async (req, res) => {
+	// Check if there's a header 'secret' with value 'f4398m6743958g3'
+	if (req.headers.secret !== process.env.PRINT_SECRET) {
+		return res.status(403).send('Forbidden')
+	}
 	generateAndPrintOrder(req.body)
 	res.sendStatus(200)
 })
