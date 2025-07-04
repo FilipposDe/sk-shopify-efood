@@ -89,7 +89,7 @@ async function renderPage(doc, instructions) {
 /**
  * @param {Object} order - Shopify order node
  */
-export async function generateAndPrintOrder(restOrder) {
+export async function generateAndPrintOrder(restOrder, preview = false) {
 	const order = await getOrderNode(restOrder.admin_graphql_api_id)
 	const shop = await getShop()
 
@@ -143,23 +143,42 @@ export async function generateAndPrintOrder(restOrder) {
 			type: 'text',
 			text: shipping.name,
 		})
-	if (shipping.address1)
-		barcodeInstructions.push({ type: 'text', text: shipping.address1 })
-	if (shipping.address2)
-		barcodeInstructions.push({ type: 'text', text: shipping.address2 })
-	if (shipping.city || shipping.zip)
+	if (shipping.address1) {
+		const truncatedAddress1 =
+			shipping.address1.length > 30
+				? shipping.address1.slice(0, 30) + '...'
+				: shipping.address1
+		barcodeInstructions.push({ type: 'text', text: truncatedAddress1 })
+	}
+	if (shipping.address2) {
+		const truncatedAddress2 =
+			shipping.address2.length > 30
+				? shipping.address2.slice(0, 30) + '...'
+				: shipping.address2
+		barcodeInstructions.push({ type: 'text', text: truncatedAddress2 })
+	}
+	if (shipping.city || shipping.zip) {
+		const truncatedCity =
+			shipping.city.length > 30
+				? shipping.city.slice(0, 30) + '...'
+				: shipping.city
+		const truncatedZip =
+			shipping.zip.length > 30
+				? shipping.zip.slice(0, 30) + '...'
+				: shipping.zip
 		barcodeInstructions.push({
 			type: 'text',
-			text: `${shipping.city || ''} ${shipping.zip || ''}`,
+			text: `${truncatedCity || ''} ${truncatedZip || ''}`,
 		})
+	}
 	if (trackingNumber) {
 		barcodeInstructions.push({
 			type: 'image',
 			url: `https://barcodeapi.org/api/128/${encodeURIComponent(
 				trackingNumber
 			)}`,
-			fitWidth: 120 * 0.75,
-			fitHeight: 50 * 0.75,
+			fitWidth: 120 * 1,
+			fitHeight: 50 * 1,
 		})
 	}
 	await renderPage(doc, barcodeInstructions)
@@ -215,7 +234,11 @@ export async function generateAndPrintOrder(restOrder) {
 	doc.end()
 	await new Promise((resolve) => stream.on('finish', resolve))
 	const buffer = Buffer.concat(bufferChunks)
-	// fs.writeFileSync('order.pdf', buffer)
+
+	if (preview) {
+		fs.writeFileSync('order.pdf', buffer)
+		return
+	}
 
 	console.log(`Generated PDF size: ${buffer.length} bytes`)
 
@@ -351,6 +374,9 @@ async function getShop() {
 	return res.data.shop
 }
 
-// generateAndPrintOrder({
-// 	admin_graphql_api_id: 'gid://shopify/Order/6736241230161',
-// }).then((buffer) => fs.writeFileSync('order.pdf', buffer))
+// generateAndPrintOrder(
+// 	{
+// 		admin_graphql_api_id: 'gid://shopify/Order/6756561191249',
+// 	},
+// 	true
+// )
