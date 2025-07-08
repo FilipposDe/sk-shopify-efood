@@ -138,47 +138,15 @@ export async function generateAndPrintOrder(restOrder, preview = false) {
 	// Barcode page (centered vertically)
 	const barcodeInstructions = []
 	barcodeInstructions.push({ type: 'text', text: order.name || '' })
-	if (shipping.name)
-		barcodeInstructions.push({
-			type: 'text',
-			text: shipping.name,
-		})
-	if (shipping.address1) {
-		const truncatedAddress1 =
-			shipping.address1.length > 30
-				? shipping.address1.slice(0, 30) + '...'
-				: shipping.address1
-		barcodeInstructions.push({ type: 'text', text: truncatedAddress1 })
-	}
-	if (shipping.address2) {
-		const truncatedAddress2 =
-			shipping.address2.length > 30
-				? shipping.address2.slice(0, 30) + '...'
-				: shipping.address2
-		barcodeInstructions.push({ type: 'text', text: truncatedAddress2 })
-	}
-	if (shipping.city || shipping.zip) {
-		const truncatedCity =
-			shipping.city.length > 30
-				? shipping.city.slice(0, 30) + '...'
-				: shipping.city
-		const truncatedZip =
-			shipping.zip.length > 30
-				? shipping.zip.slice(0, 30) + '...'
-				: shipping.zip
-		barcodeInstructions.push({
-			type: 'text',
-			text: `${truncatedCity || ''} ${truncatedZip || ''}`,
-		})
-	}
+
 	if (trackingNumber) {
 		barcodeInstructions.push({
 			type: 'image',
 			url: `https://barcodeapi.org/api/128/${encodeURIComponent(
 				trackingNumber
 			)}`,
-			fitWidth: 120 * 1,
-			fitHeight: 50 * 1,
+			fitWidth: 120 * 1.75,
+			fitHeight: 50 * 1.75,
 		})
 	}
 	await renderPage(doc, barcodeInstructions)
