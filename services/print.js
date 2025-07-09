@@ -144,7 +144,7 @@ export async function generateAndPrintOrder(restOrder, preview = false) {
 			type: 'image',
 			url: `https://barcodeapi.org/api/128/${encodeURIComponent(
 				trackingNumber
-			)}`,
+			)}%3A`,
 			fitWidth: 120 * 1.75,
 			fitHeight: 50 * 1.75,
 		})
@@ -342,9 +342,9 @@ async function getShop() {
 	return res.data.shop
 }
 
-// generateAndPrintOrder(
-// 	{
-// 		admin_graphql_api_id: 'gid://shopify/Order/6756561191249',
-// 	},
-// 	true
-// )
+generateAndPrintOrder(
+	{
+		admin_graphql_api_id: 'gid://shopify/Order/6756561191249',
+	},
+	true
+)
