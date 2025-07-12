@@ -342,9 +342,9 @@ async function getShop() {
 	return res.data.shop
 }
 
-generateAndPrintOrder(
-	{
-		admin_graphql_api_id: 'gid://shopify/Order/6756561191249',
-	},
-	true
-)
+// generateAndPrintOrder(
+// 	{
+// 		admin_graphql_api_id: 'gid://shopify/Order/6756561191249',
+// 	},
+// 	true
+// )
