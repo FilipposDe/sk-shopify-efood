@@ -223,7 +223,7 @@ export async function generateAndPrintOrder(restOrder, preview = false) {
 		},
 		body: JSON.stringify({
 			printerId: process.env.PRINT_NODE_PRINTER_ID,
-			title: `Siakos.gr order ${order.name}`,
+			title: `Order ${order.name}`,
 			contentType: 'pdf_base64',
 			content: buffer.toString('base64'),
 			options: {
