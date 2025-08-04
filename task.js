@@ -30,6 +30,9 @@ try {
 	await client.put(buffer, './catalog/siakos_7531684.csv')
 	await client.put(discountBuffer, './promotions/siakos_7531684.csv')
 
+	await client.put(buffer, './catalog/siakos_8268418.csv')
+	await client.put(discountBuffer, './promotions/siakos_8268418.csv')
+
 	console.log('File transferred successfully')
 } catch (error) {
 	console.error('SFTP connection error:', error)
