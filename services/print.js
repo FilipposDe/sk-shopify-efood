@@ -115,22 +115,33 @@ export async function generateAndPrintOrder(restOrder, preview = false) {
 	for (let i = 0; i < 2; i++) {
 		const instructions = []
 		instructions.push({ type: 'text', text: order.name || '' })
-		if (shipping.name)
+		if (Number(order.customer?.numberOfOrders) === 1) {
+			instructions.push({
+				type: 'text',
+				text: '(ΝΕΟΣ ΠΕΛΑΤΗΣ)',
+			})
+		}
+		if (shipping.name) {
 			instructions.push({ type: 'text', text: shipping.name })
-		if (shipping.address1)
+		}
+		if (shipping.address1) {
 			instructions.push({ type: 'text', text: shipping.address1 })
-		if (shipping.address2)
+		}
+		if (shipping.address2) {
 			instructions.push({ type: 'text', text: shipping.address2 })
-		if (shipping.city || shipping.zip)
+		}
+		if (shipping.city || shipping.zip) {
 			instructions.push({
 				type: 'text',
 				text: `${shipping.city || ''} ${shipping.zip || ''}`,
 			})
-		if (shipping.phone)
+		}
+		if (shipping.phone) {
 			instructions.push({
 				type: 'text',
 				text: shipping.phone.replace('+30', ''),
 			})
+		}
 		await renderPage(doc, instructions)
 		doc.addPage()
 	}
@@ -247,6 +258,9 @@ async function getOrderNode(id) {
 		query getOrder($id: ID!) {
 			order(id: $id) {
 				name
+				customer {
+					numberOfOrders
+				}
 				shippingAddress {
 					name
 					company

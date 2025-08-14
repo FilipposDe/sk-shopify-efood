@@ -4,3 +4,4 @@ temp/
 input/
 output/
 dev-out/
+*.pdf
